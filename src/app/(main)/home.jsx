@@ -1,123 +1,105 @@
-import { useEffect, useState } from "react";
-import { Text, View } from "react-native";
+import { useState } from "react";
+import { View } from "react-native";
+import { Button, TextInput } from "react-native-paper";
+
 import {
     ChannelList,
+    Chat,
     OverlayProvider,
 } from "stream-chat-expo";
 
+import Loader from "../../components/Loader";
 import { useStreamChat } from "../../hooks/useStreamChat";
+import { createConversation } from "../../services/chatService";
+import { getProfileByLinkUpId } from "../../services/profileService";
+
+import { useRouter } from "expo-router";
+import { signOut } from "../../services/authService";
 
 
 const Home = () => {
+    const { client, clientReady, userId } = useStreamChat();
 
-    const { client, clientReady } = useStreamChat();
+    const [linkUpId, setLinkUpId] = useState("");
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
 
-    const [channels, setChannels] = useState([]);
+    const router = useRouter();
+    const handleStartChat = async () => {
+        try {
+            setLoading(true);
+
+            const profile = await getProfileByLinkUpId(linkUpId);
 
 
-    useEffect(() => {
+            const channel = await createConversation(client, userId, profile.id);
 
-        if (!clientReady) {
-            return;
+            setLinkUpId("");
+
+            router.push({
+                pathname: "/(main)/chat/[id]",
+                params: { id: channel.id, },
+            });
+            setLinkUpId("");
+        } catch (error) {
+            console.log("START CHAT ERROR:", error);
+            setError(error.message)
+        } finally {
+            setLoading(false);
         }
-
-        const loadChannels = async () => {
-
-            try {
-
-                const filters = {
-                    type: "messaging",
-                    members: {
-                        $in: [client.userID],
-                    },
-                };
-
-                const sort = {
-                    last_message_at: -1,
-                };
-
-                const result = await client.queryChannels(
-                    filters,
-                    sort,
-                    {
-                        watch: true,
-                        state: true,
-                        limit: 20,
-                    }
-                );
-
-                setChannels(result);
-
-            } catch (error) {
-
-                console.log(
-                    "CHANNEL ERROR:",
-                    error
-                );
-
-            }
-        };
-
-        loadChannels();
-
-    }, [clientReady]);
+    };
 
 
-    if (!clientReady) {
-        return (
-            <View
-                style={{
-                    flex: 1,
-                    justifyContent: "center",
-                    alignItems: "center",
-                }}
-            >
-                <Text>
-                    Connecting to LinkUp...
-                </Text>
-            </View>
-        );
+    if (!clientReady || !userId) {
+        return <Loader />
     }
-
 
     return (
         <OverlayProvider>
+            <Chat client={client}>
+                <View style={{ padding: 16 }}>
 
-            <View style={{ flex: 1 }}>
+                    <TextInput
+                        label="LinkUp ID"
+                        placeholder="e.g. LU352385"
+                        value={linkUpId}
+                        onChangeText={setLinkUpId}
+                        mode="outlined"
+                        autoCapitalize="characters"
+                    />
 
-                <Text
-                    style={{
-                        fontSize: 28,
-                        fontWeight: "bold",
-                        margin: 20,
-                    }}
-                >
-                    LinkUp
-                </Text>
-
+                    <Button
+                        mode="contained"
+                        onPress={handleStartChat}
+                        loading={loading}
+                        disabled={loading}
+                        style={{ marginTop: 10 }}
+                    >
+                        Start Chat
+                    </Button>
+                    <Button onPress={signOut}>
+                        signOut
+                    </Button>
+                </View>
 
                 <ChannelList
                     filters={{
                         type: "messaging",
                         members: {
-                            $in: [client.userID],
+                            $in: [userId],
                         },
+
                     }}
-                    sort={{
-                        last_message_at: -1,
-                    }}
-                    options={{
-                        watch: true,
-                        state: true,
-                        limit: 20,
+                    onSelect={(channel) => {
+                        router.push({
+                            pathname: "/(main)/chat/[id]",
+                            params: { id: channel.id, },
+                        });
                     }}
                 />
-
-            </View>
-
+            </Chat>
         </OverlayProvider>
     );
 };
-
 
 export default Home;

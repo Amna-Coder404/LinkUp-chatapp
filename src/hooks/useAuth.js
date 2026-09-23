@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
 
-
-
 export const useAuth = () => {
     const [session, setSession] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -10,25 +8,66 @@ export const useAuth = () => {
     useEffect(() => {
         let mounted = true;
 
-        const getSession = async () => {
-            const { data, error } = await supabase.auth.getSession();
+        const initializeAuth = async () => {
+            try {
+                const {
+                    data: { session },
+                } = await supabase.auth.getSession();
 
-            if (!mounted) return;
-            if (error) {
-                console.log("Session error:", error.message);
+                if (!session) {
+                    if (mounted) {
+                        setSession(null);
+                        setLoading(false);
+                    }
+
+                    return;
+                }
+
+                // Verify that the user in the stored session
+                // still exists in Supabase Auth.
+                const { data: { user }, error, } = await supabase.auth.getUser();
+
+                if (error || !user) {
+                    console.log("Stale session found. Clearing local session.");
+
+                    await supabase.auth.signOut({
+                        scope: "local",
+                    });
+
+                    if (mounted) {
+                        setSession(null);
+                        setLoading(false);
+                    }
+
+                    return;
+                }
+
+                if (mounted) {
+                    setSession(session);
+                    setLoading(false);
+                }
+            } catch (error) {
+                console.log("AUTH INITIALIZATION ERROR:", error);
+
+                await supabase.auth.signOut({
+                    scope: "local",
+                });
+
+                if (mounted) {
+                    setSession(null);
+                    setLoading(false);
+                }
             }
-
-            setSession(data.session);
-            setLoading(false);
         };
 
-        getSession();
+        initializeAuth();
 
-        const { data: { subscription }, } =
-            supabase.auth.onAuthStateChange((_event, session) => {
-                setSession(session);
+        const { data: { subscription }, } = supabase.auth.onAuthStateChange((_event, newSession) => {
+            if (mounted) {
+                setSession(newSession);
                 setLoading(false);
-            });
+            }
+        });
 
         return () => {
             mounted = false;
@@ -40,4 +79,4 @@ export const useAuth = () => {
         session,
         loading,
     };
-}
+};

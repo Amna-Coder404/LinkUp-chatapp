@@ -12,7 +12,9 @@ const styles = StyleSheet.create({
     header: {
         marginBottom: 35,
     },
-
+    link: {
+        color: COLORS.white
+    },
     title: {
         color: COLORS.text,
         fontWeight: "700",
