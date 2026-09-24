@@ -15,8 +15,7 @@ export const createConversation = async (client, currentUserId, otherUserId) => 
     // This is create tab Between to user likr amna <---> zoha
 
     const channel = client.channel("messaging", {
-        members: [
-            currentUserId,
+        members: [currentUserId,
             otherUserId,
         ],
     });
@@ -27,3 +26,7 @@ export const createConversation = async (client, currentUserId, otherUserId) => 
 
     return channel;
 };
+
+
+
+// GEt Other

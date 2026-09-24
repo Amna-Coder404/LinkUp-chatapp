@@ -7,7 +7,7 @@ export const useStreamCall = () => {
 
     const [calling, setCalling] = useState(false);
 
-    const startAudioCall = async (currentUserId, otherUserId) => {
+    const startAudioCall = async (currentUserId, otherUserId, otherUserOnline) => {
         if (!videoClient) {
             throw new Error("Stream Video is not ready.");
         }

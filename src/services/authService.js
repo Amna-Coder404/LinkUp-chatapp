@@ -3,7 +3,9 @@ import { supabase } from "../lib/supabase";
 
 
 
-const DEFAULT_AVATAR_URL = "hhttps://qilovxyzvwoumckbwwna.supabase.co/storage/v1/object/public/avatars/default-avatar.png";
+const DEFAULT_AVATAR_URL = "https://qilovxyzvwoumckbwwna.supabase.co/storage/v1/object/public/avatars/default-avatar.png";
+
+
 export const signUpUser = async ({ email, password, fullName }) => {
 
     const { data, error } = await supabase.auth.signUp({ email, password });

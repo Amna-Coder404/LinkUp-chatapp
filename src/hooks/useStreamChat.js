@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 
 import { streamClient } from "../lib/stream";
 import { supabase } from "../lib/supabase";
+import { getCurrentUserProfile, getOtherUserProfile } from "../services/profileService";
 import { getStreamToken } from "../services/streamService";
 
 export const useStreamChat = (channelId = null) => {
@@ -20,10 +21,7 @@ export const useStreamChat = (channelId = null) => {
             try {
                 setClientReady(false);
 
-                const {
-                    data: { user },
-                    error,
-                } = await supabase.auth.getUser();
+                const { data: { user }, error, } = await supabase.auth.getUser();
 
                 if (error) {
                     throw error;
@@ -38,42 +36,20 @@ export const useStreamChat = (channelId = null) => {
                     return;
                 }
 
-                const {
-                    data: profile,
-                    error: profileError,
-                } = await supabase
-                    .from("profiles")
-                    .select(
-                        "full_name, linkup_id, avatar_url"
-                    )
-                    .eq("id", user.id)
-                    .single();
+                const profile = await getCurrentUserProfile(user.id);
 
-                if (profileError) {
-                    throw profileError;
-                }
 
                 if (!mounted) return;
 
                 setUserId(user.id);
 
                 // Disconnect previous user if necessary
-                if (
-                    streamClient.userID &&
-                    streamClient.userID !== user.id
-                ) {
-                    console.log(
-                        "Disconnecting previous Stream user..."
-                    );
-
+                if (streamClient.userID && streamClient.userID !== user.id) {
                     await streamClient.disconnectUser();
                 }
 
                 // Already connected as this user
                 if (streamClient.userID === user.id) {
-                    console.log(
-                        "Stream already connected as current user."
-                    );
 
                     if (mounted) {
                         setClientReady(true);
@@ -84,10 +60,8 @@ export const useStreamChat = (channelId = null) => {
 
                 const result = await getStreamToken();
 
-                if (!result?.token) {
-                    throw new Error(
-                        "Stream token was not returned."
-                    );
+                if (!result.token) {
+                    throw new Error("Stream token was not returned.");
                 }
 
                 if (!mounted) return;
@@ -102,18 +76,10 @@ export const useStreamChat = (channelId = null) => {
                     result.token
                 );
 
-                console.log(
-                    "Stream connected successfully."
-                );
 
-                if (mounted) {
-                    setClientReady(true);
-                }
+
+                if (mounted) { setClientReady(true); }
             } catch (error) {
-                console.log(
-                    "STREAM CONNECTION ERROR:",
-                    error
-                );
 
                 if (mounted) {
                     setClientReady(false);
@@ -141,24 +107,21 @@ export const useStreamChat = (channelId = null) => {
             try {
                 setChannelLoading(true);
 
-                const id = Array.isArray(channelId)
-                    ? channelId[0]
-                    : channelId;
+                // this line check my channl are array or not if 
+                const id = Array.isArray(channelId) ? channelId[0] : channelId;
 
-                const selectedChannel = streamClient.channel(
-                    "messaging",
-                    id
+                const selectedChannel = streamClient.channel("messaging", id
                 );
 
                 await selectedChannel.watch();
 
-                const members = Object.values(
-                    selectedChannel.state.members
-                );
+                // that give us member in channl detail
+                const members = Object.values(selectedChannel.state.members);
 
+
+                // si tarah hum "other user" nikal rahe hain.
                 const otherMember = members.find(
-                    (member) =>
-                        member.user_id !== streamClient.userID
+                    (member) => member.user_id !== streamClient.userID
                 );
 
                 if (!otherMember) {
@@ -167,19 +130,8 @@ export const useStreamChat = (channelId = null) => {
                     );
                 }
 
-                const { data: profile, error: profileError, } = await supabase
-                    .from("profiles")
-                    .select(
-                        "id, full_name, linkup_id, avatar_url"
-                    )
-                    .eq("id", otherMember.user_id)
-                    .single();
 
-                if (profileError) {
-                    throw profileError;
-                }
-
-                if (!mounted) return;
+                const profile = await getOtherUserProfile(otherMember.user_id);
 
                 setChannel(selectedChannel);
 
