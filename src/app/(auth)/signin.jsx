@@ -1,97 +1,211 @@
-import { useState } from 'react';
-import { KeyboardAvoidingView, Platform, Text, TouchableOpacity, View } from 'react-native';
-import { Button, TextInput } from "react-native-paper";
+import { useState } from "react";
+import {
+    Image,
+    KeyboardAvoidingView,
+    Platform,
+    ScrollView,
+    TouchableOpacity,
+    View,
+} from "react-native";
 
-import { router } from 'expo-router';
-import styles from "../..//styles/auth.styles";
-import COLORS from '../../constants/colors';
-import { signin } from '../../services/authService';
+import { router } from "expo-router";
+import { Button, Text, TextInput } from "react-native-paper";
 
-
+import COLORS from "../../constants/colors";
+import { signin } from "../../services/authService";
+import styles from "../../styles/auth.styles";
 
 const SignIn = () => {
     const [email, setEmail] = useState("");
-
     const [password, setPassword] = useState("");
+
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
-
     const [secureText, setSecureText] = useState(true);
 
-
     const handleSignIn = async () => {
+        setError("");
+
+        if (!email.trim() || !password) {
+            setError("All fields are required.");
+            return;
+        }
+
         setLoading(true);
+
         try {
-            if (!email || !password) {
-                setError("All Fileds are Required!");
-            }
-            const trimEmail = email.trim();
+            await signin({
+                email: email.trim(),
+                password,
+            });
 
+            console.log("User Signed In!");
 
-            await signin({ email: trimEmail, password });
-            console.log("User Created!")
             setEmail("");
-
             setPassword("");
-
         } catch (error) {
-            setError(error.message);
-            console.log("ERROR ", error);
+            console.log("SIGN IN ERROR:", error);
+            setError(error.message || "Something went wrong.");
         } finally {
             setLoading(false);
         }
-    }
+    };
 
     return (
-        <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : "height"} >
-            <View style={styles.container}>
+        <KeyboardAvoidingView
+            style={{ flex: 1 }}
+            behavior={
+                Platform.OS === "ios"
+                    ? "padding"
+                    : "height"
+            }
+        >
+            <ScrollView
+                contentContainerStyle={styles.content}
+                keyboardShouldPersistTaps="handled"
+                showsVerticalScrollIndicator={false}
+            >
 
-                <TextInput
-                    label="Email"
-                    mode="outlined"
-                    value={email}
-                    onChangeText={setEmail}
-                    style={styles.input}
-                    textColor={COLORS.text}
-                />
 
-                <TextInput
-                    label="Password"
-                    mode="outlined"
-                    secureTextEntry={secureText}
-                    value={password}
-                    onChangeText={setPassword}
-                    style={styles.input}
-                    textColor={COLORS.text}
-                    right={
-                        <TextInput.Icon
-                            icon={secureText ? "eye" : "eye-off"}
-                            onPress={() => setSecureText(!secureText)}
-                        />
-                    }
-                    theme={{
-                        colors: {
-                            onSurfaceVariant: COLORS.textSecondary,
-                        },
-                    }}
-                />
-                {error && (
-                    <Text style={{ color: "red", marginBottom: 10 }}>
-                        {error}
+                {/* Brand */}
+                <View style={styles.topBar}>
+                    <Text style={styles.brand}>
+                        LinkUp
+                        <Text style={styles.brandDot}>.</Text>
                     </Text>
-                )}
 
-                <Button mode="contained" onPress={handleSignIn} loading={loading}>
-                    Sign In
-                </Button>
 
-                <TouchableOpacity onPress={() => router.back()} >
+                    {/* Logo */}
+                    <Image
+                        source={require("../../../assets/images/imgs/logo.png")}
+                        style={styles.logo}
+                        resizeMode="contain"
+                    />
+                </View>
+                {/* Hero */}
+                <View style={styles.hero}>
+                    <Text style={styles.eyebrow}>
+                        Welcome back
+                    </Text>
 
-                    <Text style={styles.link}> Create Account</Text>
-                </TouchableOpacity>
-            </View>
+                    <Text style={styles.heroTitle}>
+                        LET'S{"\n"}
+                        <Text style={styles.heroAccent}>
+                            CONNECT.
+                        </Text>
+                    </Text>
+
+                    <Text style={styles.heroSubtitle}>
+                        Your people, your conversations,
+                        all in one place.
+                    </Text>
+                </View>
+
+                {/* Form */}
+                <View style={styles.formCard}>
+                    <View style={styles.form}>
+
+                        {/* Email */}
+                        <View style={styles.inputWrapper}>
+                            <TextInput
+                                label="Email"
+                                mode="flat"
+                                value={email}
+                                onChangeText={setEmail}
+                                keyboardType="email-address"
+                                autoCapitalize="none"
+                                autoCorrect={false}
+                                style={styles.input}
+                                textColor={COLORS.text}
+                                underlineColor="transparent"
+                                activeUnderlineColor={
+                                    COLORS.primary
+                                }
+                            />
+                        </View>
+
+                        {/* Password */}
+                        <View style={styles.inputWrapper}>
+                            <TextInput
+                                label="Password"
+                                mode="flat"
+                                secureTextEntry={secureText}
+                                value={password}
+                                onChangeText={setPassword}
+                                style={styles.input}
+                                textColor={COLORS.text}
+                                underlineColor="transparent"
+                                activeUnderlineColor={
+                                    COLORS.primary
+                                }
+                                right={
+                                    <TextInput.Icon
+                                        icon={
+                                            secureText
+                                                ? "eye"
+                                                : "eye-off"
+                                        }
+                                        onPress={() =>
+                                            setSecureText(
+                                                !secureText
+                                            )
+                                        }
+                                    />
+                                }
+                                theme={{
+                                    colors: {
+                                        onSurfaceVariant:
+                                            COLORS.textSecondary,
+                                    },
+                                }}
+                            />
+                        </View>
+
+                        {/* Error */}
+                        {error ? (
+                            <Text style={styles.error}>
+                                {error}
+                            </Text>
+                        ) : null}
+
+                        {/* Sign In */}
+                        <Button
+                            mode="contained"
+                            onPress={handleSignIn}
+                            loading={loading}
+                            disabled={loading}
+                            style={styles.button}
+                            contentStyle={styles.buttonContent}
+                        >
+                            Continue
+                        </Button>
+                    </View>
+                </View>
+                {/* Sign Up */}
+                <View style={styles.accountRow}>
+                    <Text style={styles.accountText}>
+                        New to LinkUp?
+                    </Text>
+
+                    <TouchableOpacity onPress={() => router.replace("/(auth)/signup")}
+                    >
+                        <Text style={styles.link}>
+                            {" "}Create account
+                        </Text>
+                    </TouchableOpacity>
+                </View>
+
+                {/* Footer */}
+                <View style={styles.footer}>
+                    <Text style={styles.footerText}>
+                        Connect • Chat • Call
+                    </Text>
+                </View>
+
+
+            </ScrollView>
         </KeyboardAvoidingView>
-    )
-}
+    );
+};
 
-export default SignIn
+export default SignIn;

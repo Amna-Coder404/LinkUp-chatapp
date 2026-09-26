@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "LinkUp-chatapp",
+    "name": "LinkUp",
     "slug": "LinkUp-chatapp",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "linkupchatapp",
@@ -34,7 +34,8 @@
         "android.permission.INTERNET",
         "android.permission.SYSTEM_ALERT_WINDOW"
       ],
-      "package": "com.devamna.LinkUpchatapp"
+      "package": "com.devamna.LinkUpchatapp",
+      "softwareKeyboardLayoutMode": "resize"
     },
     "web": {
       "output": "static",
@@ -47,7 +48,7 @@
         {
           "backgroundColor": "#208AEF",
           "image": "./assets/images/splash-icon.png",
-          "imageWidth": 90,
+          "imageWidth": 140,
           "resizeMode": "contain"
         }
       ],

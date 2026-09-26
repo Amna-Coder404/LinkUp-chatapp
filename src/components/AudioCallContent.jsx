@@ -9,7 +9,7 @@ import { Avatar, IconButton, Text, useTheme } from "react-native-paper";
 import COLORS from "../constants/colors";
 import styles from "../styles/AudioCall.styles";
 import formatCallDuration from "../utils/formatCallDuration";
-import getImageSource from "../utils/getImageSource";
+import { getImageSource } from "../utils/getImageSource";
 
 
 // UI (user interface)

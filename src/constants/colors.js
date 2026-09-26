@@ -1,26 +1,26 @@
 const COLORS = {
     // Backgrounds
-    background: "#0B0B0F",
-    surface: "#15151C",
-    surfaceElevated: "#1D1D26",
+    background: "#F7F7FB",
+    surface: "#FFFFFF",
+    surfaceElevated: "#F0F0F6",
 
     // Brand
     primary: "#7C5CFC",
-    primaryLight: "#9B82FF",
+    primaryLight: "#9278FF",
     secondary: "#4D8DFF",
 
     // Text
-    text: "#FFFFFF",
-    textSecondary: "#A5A5B5",
-    textMuted: "#6F6F7C",
+    text: "#111118",
+    textSecondary: "#686875",
+    textMuted: "#9696A5",
 
     // Borders
-    border: "#292933",
+    border: "#E1E1E9",
 
     // Status
-    success: "#35D07F",
-    danger: "#FF5C6C",
-    warning: "#FFB84D",
+    success: "#2BB673",
+    danger: "#E5485D",
+    warning: "#F2A93B",
 
     // Common
     white: "#FFFFFF",

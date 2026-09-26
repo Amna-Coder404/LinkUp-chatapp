@@ -3,7 +3,6 @@ import { supabase } from "../lib/supabase";
 
 
 
-const DEFAULT_AVATAR_URL = "https://qilovxyzvwoumckbwwna.supabase.co/storage/v1/object/public/avatars/default-avatar.png";
 
 
 export const signUpUser = async ({ email, password, fullName }) => {
@@ -32,7 +31,7 @@ export const signUpUser = async ({ email, password, fullName }) => {
             id: user.id,
             full_name: fullName,
             linkup_id: linkupId,
-            avatar_url: DEFAULT_AVATAR_URL
+            avatar_url: null
         });
 
 

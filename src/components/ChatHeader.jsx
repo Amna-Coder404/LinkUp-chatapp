@@ -1,8 +1,10 @@
 import { View } from "react-native";
 import { Avatar, IconButton, Text } from "react-native-paper";
 
+import COLORS from "../constants/colors";
 import { useStreamCall } from "../hooks/useStreamCall";
 import styles from "../styles/Chatui.styles";
+import { getProfileInitial } from "../utils/getImageSource";
 
 
 
@@ -42,7 +44,8 @@ const ChatHeader = ({ channel, otherUser, currentUserId, onBack, }) => {
             ) : (
                 <Avatar.Text
                     size={42}
-                    label={otherUser?.name?.charAt(0)?.toUpperCase() || "U"}
+                    label={getProfileInitial(otherUser?.name)}
+                    color={COLORS.white}
                 />
             )}
 
