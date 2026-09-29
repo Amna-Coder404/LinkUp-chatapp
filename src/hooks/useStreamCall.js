@@ -1,13 +1,18 @@
 
-import { useStreamVideoClient } from "@stream-io/video-react-native-sdk";
+import { useStreamVideoClient, } from "@stream-io/video-react-native-sdk";
 import { useState } from "react";
+import { createCallHistory, } from "../services/callHistoryService";
+
+
+
 
 export const useStreamCall = () => {
     const videoClient = useStreamVideoClient();
 
     const [calling, setCalling] = useState(false);
 
-    const startAudioCall = async (currentUserId, otherUserId, otherUserOnline) => {
+    // START AUDIO CALL
+    const startAudioCall = async (currentUserId, otherUserId) => {
         if (!videoClient) {
             throw new Error("Stream Video is not ready.");
         }
@@ -23,14 +28,9 @@ export const useStreamCall = () => {
         try {
             setCalling(true);
 
-            const callId = `audio-${Date.now()}-${Math.random()
-                .toString(36)
-                .slice(2, 8)}`;
+            const callId = `audio-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 
-            const call = videoClient.call(
-                "default",
-                callId
-            );
+            const call = videoClient.call("default", callId);
 
             await call.getOrCreate({
                 ring: true,
@@ -46,20 +46,34 @@ export const useStreamCall = () => {
                     ],
                     custom: {
                         callMode: "audio",
+                        callerId: currentUserId,
                     },
                 },
             });
 
-            console.log("AUDIO CALL STARTED");
+            // Create ringing call history
+
+            try {
+                await createCallHistory({
+                    streamCallId: call.id,
+                    callerId: currentUserId,
+                    receiverId: otherUserId,
+                    callType: "audio",
+                    startedAt: null,
+                    endedAt: null,
+                    status: "ringing",
+                });
+            } catch (historyError) {
+                console.log("CREATE RINGING CALL HISTORY ERROR:", historyError);
+            }
 
             return call;
-        } catch (error) {
-            console.log("AUDIO CALL ERROR:", error);
-            throw error;
         } finally {
             setCalling(false);
         }
     };
+
+    // START VIDEO CALL
 
     const startVideoCall = async (currentUserId, otherUserId) => {
         if (!videoClient) {
@@ -81,14 +95,12 @@ export const useStreamCall = () => {
                 .toString(36)
                 .slice(2, 8)}`;
 
-            const call = videoClient.call(
-                "default",
-                callId
-            );
+            const call = videoClient.call("default", callId);
 
             await call.getOrCreate({
                 ring: true,
                 video: true,
+
                 data: {
                     members: [
                         {
@@ -98,18 +110,31 @@ export const useStreamCall = () => {
                             user_id: otherUserId,
                         },
                     ],
+
                     custom: {
                         callMode: "video",
+                        callerId: currentUserId,
                     },
                 },
             });
 
-            console.log("VIDEO CALL STARTED");
+            // Create ringing call history
+
+            try {
+                await createCallHistory({
+                    streamCallId: call.id,
+                    callerId: currentUserId,
+                    receiverId: otherUserId,
+                    callType: "video",
+                    startedAt: null,
+                    endedAt: null,
+                    status: "ringing",
+                });
+            } catch (historyError) {
+                console.log("CREATE RINGING CALL HISTORY ERROR:", historyError);
+            }
 
             return call;
-        } catch (error) {
-            console.log("VIDEO CALL ERROR:", error);
-            throw error;
         } finally {
             setCalling(false);
         }

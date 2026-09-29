@@ -2,8 +2,9 @@ import { TouchableOpacity, View } from "react-native";
 import { Icon, Modal, Portal, Text } from "react-native-paper";
 
 
-import COLORS from "../../../constants/colors";
-import styles from "../../../styles/ProfilePhotoModal.styles";
+
+import COLORS from "../../constants/colors";
+import styles from "../../styles/ProfilePhotoModal.styles";
 
 
 const ProfilePhotoModal = ({

@@ -1,3 +1,4 @@
+
 import { router } from "expo-router";
 import { useState } from "react";
 import {
@@ -17,12 +18,14 @@ import {
 } from "react-native-paper";
 
 import Loader from "../../components/Loader";
-import EditProfileModal from "./Modals/EditProfileModal";
-import ProfileImagePreview from "./Modals/ProfileImagePreview";
-import ProfilePhotoModal from "./Modals/ProfilePhotoModal";
+import EditProfileModal from "../../components/Modals/EditProfileModal";
+import ProfileImagePreview from "../../components/Modals/ProfileImagePreview";
+import ProfilePhotoModal from "../../components/Modals/ProfilePhotoModal";
 
 import COLORS from "../../constants/colors";
+import { useAuth } from "../../hooks/useAuth";
 import useProfile from "../../hooks/useProfile";
+
 import styles from "../../styles/Profile.styles";
 import { getProfileInitial } from "../../utils/getImageSource";
 
@@ -31,11 +34,16 @@ const Profile = () => {
     const [imagePreviewOpen, setImagePreviewOpen] = useState(false);
     const [editProfileOpen, setEditProfileOpen] = useState(false);
 
+    // AUTH
     const {
         user,
+        loading: authLoading,
+    } = useAuth();
+
+    // PROFILE
+    const {
         profile,
-        loading,
-        avatarPreview,
+        loading: profileLoading,
         avatarUploading,
         profileSaving,
         copyLinkUpId,
@@ -44,14 +52,17 @@ const Profile = () => {
         removeProfilePhoto,
         updateProfileInfo,
         handleSignOut,
-    } = useProfile();
+    } = useProfile(user);
+
+    const loading =
+        authLoading || profileLoading;
 
     if (loading) {
         return <Loader />;
     }
 
     const currentImage =
-        avatarPreview || profile?.avatar_url;
+        profile?.avatar_url || null;
 
     return (
         <ScrollView
@@ -69,13 +80,13 @@ const Profile = () => {
                     style={styles.headerButton}
                 />
 
-
-
                 <IconButton
                     icon="pencil-outline"
                     size={21}
                     iconColor={COLORS.text}
-                    onPress={() => setEditProfileOpen(true)}
+                    onPress={() =>
+                        setEditProfileOpen(true)
+                    }
                     style={styles.headerButton}
                 />
             </View>
@@ -90,15 +101,14 @@ const Profile = () => {
                     >
                         {currentImage ? (
                             <Image
-                                source={{ uri: currentImage }}
+                                source={{ uri: currentImage, }}
                                 style={styles.avatar}
                                 resizeMode="cover"
                             />
                         ) : (
                             <Avatar.Text
                                 size={108}
-                                label={getProfileInitial(profile?.full_name
-                                )}
+                                label={getProfileInitial(profile?.full_name)}
                                 style={styles.avatarFallback}
                                 color={COLORS.white}
                             />
@@ -106,7 +116,7 @@ const Profile = () => {
                     </TouchableOpacity>
 
                     {avatarUploading && (
-                        <View style={styles.avatarLoader}>
+                        <View style={styles.avatarLoader}   >
                             <ActivityIndicator
                                 size="small"
                                 color={COLORS.primary}
@@ -114,6 +124,7 @@ const Profile = () => {
                         </View>
                     )}
                 </View>
+
                 <Text style={styles.name}>
                     {profile?.full_name || "User"}
                 </Text>
@@ -142,7 +153,10 @@ const Profile = () => {
                 Privacy & Safety
             </Text>
 
-            <TouchableOpacity style={styles.menuItem} onPress={() => { }}   >
+            <TouchableOpacity
+                style={styles.menuItem}
+                onPress={() => { }}
+            >
                 <View style={styles.menuIcon}>
                     <Icon
                         source="account-cancel-outline"
@@ -156,7 +170,11 @@ const Profile = () => {
                         Blocked Users
                     </Text>
 
-                    <Text style={styles.menuSubtitle}>
+                    <Text
+                        style={
+                            styles.menuSubtitle
+                        }
+                    >
                         Manage blocked accounts
                     </Text>
                 </View>
@@ -164,11 +182,11 @@ const Profile = () => {
                 <Icon
                     source="chevron-right"
                     size={22}
-                    color={COLORS.textMuted}
+                    color={
+                        COLORS.textMuted
+                    }
                 />
             </TouchableOpacity>
-
-
 
             {/* Sign out */}
             <Button
@@ -176,7 +194,9 @@ const Profile = () => {
                 icon="logout"
                 textColor={COLORS.danger}
                 style={styles.logoutButton}
-                contentStyle={styles.logoutContent}
+                contentStyle={
+                    styles.logoutContent
+                }
                 onPress={handleSignOut}
             >
                 Sign out
@@ -185,7 +205,9 @@ const Profile = () => {
             {/* Edit Profile Modal */}
             <EditProfileModal
                 visible={editProfileOpen}
-                onClose={() => setEditProfileOpen(false)}
+                onClose={() =>
+                    setEditProfileOpen(false)
+                }
                 profile={profile}
                 saving={profileSaving}
                 onSave={updateProfileInfo}
@@ -198,7 +220,9 @@ const Profile = () => {
             {/* Photo Actions Modal */}
             <ProfilePhotoModal
                 visible={photoModalOpen}
-                onClose={() => setPhotoModalOpen(false)}
+                onClose={() =>
+                    setPhotoModalOpen(false)
+                }
                 image={currentImage}
                 onTakePhoto={() => {
                     setPhotoModalOpen(false);
@@ -222,7 +246,9 @@ const Profile = () => {
             <ProfileImagePreview
                 visible={imagePreviewOpen}
                 image={currentImage}
-                onClose={() => setImagePreviewOpen(false)}
+                onClose={() =>
+                    setImagePreviewOpen(false)
+                }
             />
         </ScrollView>
     );

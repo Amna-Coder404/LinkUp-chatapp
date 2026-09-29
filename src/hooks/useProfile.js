@@ -1,10 +1,11 @@
+
 import * as Clipboard from "expo-clipboard";
 import * as ImagePicker from "expo-image-picker";
 import { useEffect, useState } from "react";
 import { Alert } from "react-native";
 
-import { supabase } from "../lib/supabase";
 import { signOut } from "../services/authService";
+
 import {
     deleteProfileAvatar,
     getCurrentUserProfile,
@@ -12,74 +13,90 @@ import {
     updateProfileAvatar,
 } from "../services/profileService";
 
-const useProfile = () => {
-    const [user, setUser] = useState(null);
+const useProfile = (user) => {
     const [profile, setProfile] = useState(null);
     const [loading, setLoading] = useState(true);
+
     const [avatarMenuOpen, setAvatarMenuOpen] = useState(false);
     const [avatarUploading, setAvatarUploading] = useState(false);
     const [profileSaving, setProfileSaving] = useState(false);
 
     const loadProfile = async () => {
+        if (!user?.id) {
+            setProfile(null);
+            setLoading(false);
+            return;
+        }
+
         try {
             setLoading(true);
 
-            const {
-                data: { user },
-                error,
-            } = await supabase.auth.getUser();
-
-            if (error) throw error;
-            if (!user) return;
-
-            setUser(user);
-
-            const profileData = await getCurrentUserProfile(user.id);
+            const profileData =
+                await getCurrentUserProfile(user.id);
 
             setProfile(profileData);
         } catch (error) {
             console.log("PROFILE ERROR:", error);
+            setProfile(null);
         } finally {
             setLoading(false);
         }
     };
 
-    // Copy LinkUp ID
+    useEffect(() => {
+        loadProfile();
+    }, [user?.id]);
+
     const copyLinkUpId = async () => {
         if (!profile?.linkup_id) return;
 
-        await Clipboard.setStringAsync(profile.linkup_id);
+        try {
+            await Clipboard.setStringAsync(
+                profile.linkup_id
+            );
+        } catch (error) {
+            console.log(
+                "COPY LINKUP ID ERROR:",
+                error
+            );
+        }
     };
 
-    // Upload selected image
     const uploadAvatar = async (image) => {
         if (!user?.id || !image) return;
 
         try {
             setAvatarUploading(true);
 
-            const updatedProfile = await updateProfileAvatar(
-                user.id,
-                image
-            );
+            const updatedProfile =
+                await updateProfileAvatar(
+                    user.id,
+                    image
+                );
 
             setProfile(updatedProfile);
             setAvatarMenuOpen(false);
         } catch (error) {
-            console.log("AVATAR UPLOAD ERROR:", error);
+            console.log(
+                "AVATAR UPLOAD ERROR:",
+                error
+            );
         } finally {
             setAvatarUploading(false);
         }
     };
 
-    // Take photo
     const takeProfilePhoto = async () => {
         try {
             const permission =
                 await ImagePicker.requestCameraPermissionsAsync();
 
             if (!permission.granted) {
-                console.log("Camera permission denied");
+                Alert.alert(
+                    "Permission required",
+                    "Camera permission is required to take a profile photo."
+                );
+
                 return;
             }
 
@@ -93,13 +110,19 @@ const useProfile = () => {
 
             if (result.canceled) return;
 
-            await uploadAvatar(result.assets[0]);
+            const image = result.assets?.[0];
+
+            if (!image) return;
+
+            await uploadAvatar(image);
         } catch (error) {
-            console.log("TAKE PHOTO ERROR:", error);
+            console.log(
+                "TAKE PHOTO ERROR:",
+                error
+            );
         }
     };
 
-    // Choose from gallery
     const chooseProfilePhoto = async () => {
         try {
             const result =
@@ -112,15 +135,23 @@ const useProfile = () => {
 
             if (result.canceled) return;
 
-            await uploadAvatar(result.assets[0]);
+            const image = result.assets?.[0];
+
+            if (!image) return;
+
+            await uploadAvatar(image);
         } catch (error) {
-            console.log("GALLERY ERROR:", error);
+            console.log(
+                "GALLERY ERROR:",
+                error
+            );
         }
     };
 
-    // Delete profile photo
     const removeProfilePhoto = () => {
-        if (!user?.id || !profile?.avatar_url) return;
+        if (!user?.id || !profile?.avatar_url) {
+            return;
+        }
 
         Alert.alert(
             "Delete profile photo",
@@ -133,6 +164,7 @@ const useProfile = () => {
                 {
                     text: "Delete",
                     style: "destructive",
+
                     onPress: async () => {
                         try {
                             setAvatarUploading(true);
@@ -162,7 +194,54 @@ const useProfile = () => {
         );
     };
 
-    // Sign out
+    const updateProfileInfo = async ({
+        fullName,
+        linkUpId,
+    }) => {
+        if (!user?.id) {
+            return {
+                success: false,
+                error: "User is not authenticated.",
+            };
+        }
+
+        try {
+            setProfileSaving(true);
+
+            const updatedProfile =
+                await updateProfile(
+                    user.id,
+                    {
+                        fullName,
+                        linkUpId,
+                    }
+                );
+
+            setProfile((current) => ({
+                ...current,
+                ...updatedProfile,
+            }));
+
+            return {
+                success: true,
+            };
+        } catch (error) {
+            console.log(
+                "UPDATE PROFILE ERROR:",
+                error
+            );
+
+            return {
+                success: false,
+                error:
+                    error?.message ||
+                    "Failed to update profile.",
+            };
+        } finally {
+            setProfileSaving(false);
+        }
+    };
+
     const handleSignOut = () => {
         Alert.alert(
             "Sign out",
@@ -175,6 +254,7 @@ const useProfile = () => {
                 {
                     text: "Sign out",
                     style: "destructive",
+
                     onPress: async () => {
                         try {
                             await signOut();
@@ -190,59 +270,29 @@ const useProfile = () => {
         );
     };
 
-    useEffect(() => {
-        loadProfile();
-    }, []);
-
-    // Update profile
-    const updateProfileInfo = async ({ fullName, linkUpId, }) => {
-        try {
-            setProfileSaving(true);
-
-            const updatedProfile = await updateProfile(
-                user.id,
-                {
-                    fullName,
-                    linkUpId,
-                }
-            );
-
-            setProfile((current) => ({
-                ...current,
-                ...updatedProfile,
-            }));
-
-            return { success: true, };
-        } catch (error) {
-            console.log("UPDATE PROFILE ERROR:", error);
-
-            return {
-                success: false,
-                error: error.message,
-            };
-        } finally {
-            setProfileSaving(false);
-        }
-    };
-
     return {
-        user,
         profile,
         loading,
 
         avatarMenuOpen,
         setAvatarMenuOpen,
-        avatarUploading,
 
+        avatarUploading,
         profileSaving,
 
         copyLinkUpId,
+
         takeProfilePhoto,
         chooseProfilePhoto,
         removeProfilePhoto,
+
         updateProfileInfo,
+
         handleSignOut,
+
+        loadProfile,
     };
 };
 
 export default useProfile;
+

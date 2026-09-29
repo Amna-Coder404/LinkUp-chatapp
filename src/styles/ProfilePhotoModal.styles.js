@@ -39,7 +39,9 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,
         borderBottomColor: COLORS.border,
     },
-
+    previewAvatar: {
+        backgroundColor: "red",
+    },
     actionText: {
         color: COLORS.text,
         fontSize: 15,
@@ -65,7 +67,7 @@ const styles = StyleSheet.create({
     previewContainer: {
         flex: 1,
         margin: 0,
-        backgroundColor: "rgba(0,0,0,0.96)",
+        backgroundColor: "transparent",
         justifyContent: "center",
         alignItems: "center",
     },
@@ -82,6 +84,13 @@ const styles = StyleSheet.create({
         zIndex: 10,
         backgroundColor: "rgba(255,255,255,0.12)",
         borderRadius: 14,
+    },
+
+    noImageText: {
+        color: COLORS.white,
+        fontSize: 18,
+        fontWeight: "600",
+        textAlign: "center",
     },
 });
 

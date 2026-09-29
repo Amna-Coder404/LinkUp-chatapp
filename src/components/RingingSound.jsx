@@ -1,33 +1,47 @@
+import { useAudioPlayer } from "expo-audio";
 import { useEffect } from "react";
-import SoundPlayer from "react-native-sound-player";
 
 import {
-    CallingState, useCall, useCallStateHooks,
+    CallingState,
+    useCall,
+    useCallStateHooks,
 } from "@stream-io/video-react-native-sdk";
+
+const incomingSound = require("../../assets/sounds/incoming_call.mp3");
+const outgoingSound = require("../../assets/sounds/outgoing_call.mp3");
 
 const RingingSound = () => {
     const call = useCall();
-
     const { useCallCallingState } = useCallStateHooks();
 
     const callingState = useCallCallingState();
 
+    const incomingPlayer = useAudioPlayer(incomingSound);
+    const outgoingPlayer = useAudioPlayer(outgoingSound);
+
     useEffect(() => {
         if (callingState !== CallingState.RINGING) {
+            incomingPlayer.pause();
+            outgoingPlayer.pause();
             return;
         }
 
+        const player = call?.isCreatedByMe
+            ? outgoingPlayer
+            : incomingPlayer;
+
         try {
-            SoundPlayer.playSoundFile(
-                call?.isCreatedByMe ? "outgoing_call" : "incoming_call", "mp3"
-            );
+            player.seekTo(0);
+            player.loop = true;
+            player.play();
         } catch (error) {
             console.log("RING SOUND ERROR:", error);
         }
 
         return () => {
             try {
-                SoundPlayer.stop();
+                player.pause();
+                player.seekTo(0);
             } catch (error) {
                 console.log("STOP RING SOUND ERROR:", error);
             }

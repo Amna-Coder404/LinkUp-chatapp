@@ -14,12 +14,14 @@
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#208AEF",
+        "backgroundColor": "#fff",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false,
+      "package": "com.devamna.LinkUpchatapp",
+      "googleServicesFile": "./google-services.json",
       "permissions": [
         "android.permission.RECORD_AUDIO",
         "android.permission.MODIFY_AUDIO_SETTINGS",
@@ -34,7 +36,6 @@
         "android.permission.INTERNET",
         "android.permission.SYSTEM_ALERT_WINDOW"
       ],
-      "package": "com.devamna.LinkUpchatapp",
       "softwareKeyboardLayoutMode": "resize"
     },
     "web": {
@@ -56,7 +57,12 @@
       "expo-audio",
       "expo-asset",
       "expo-sharing",
-      "@stream-io/video-react-native-sdk",
+      [
+        "@stream-io/video-react-native-sdk",
+        {
+          "ringing": true
+        }
+      ],
       [
         "@config-plugins/react-native-webrtc",
         {
@@ -80,8 +86,9 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "19117ee9-81f2-45ad-bfd7-bdfee2d4fa7b"
+        "projectId": "a390604e-fb6b-4b09-9691-2a5ff45edb45"
       }
-    }
+    },
+    "owner": "mobile-dev-pro"
   }
 }

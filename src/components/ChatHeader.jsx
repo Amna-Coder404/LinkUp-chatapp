@@ -1,22 +1,33 @@
-import { View } from "react-native";
+;
 import { Avatar, IconButton, Text } from "react-native-paper";
 
+import { useState } from "react";
+import { Pressable, View } from "react-native";
 import COLORS from "../constants/colors";
 import { useStreamCall } from "../hooks/useStreamCall";
 import styles from "../styles/Chatui.styles";
 import { getProfileInitial } from "../utils/getImageSource";
-
-
+import ProfileImagePreview from "./Modals/ProfileImagePreview";
 
 
 const ChatHeader = ({ channel, otherUser, currentUserId, onBack, }) => {
     const { calling, startAudioCall, startVideoCall, } = useStreamCall();
 
+    const [imagePreviewOpen, setImagePreviewOpen] = useState(false);
+
     const handleAudioCall = async () => {
         try {
-            await startAudioCall(currentUserId, otherUser.id);
+
+            await startAudioCall(
+                currentUserId,
+                otherUser?.id
+            );
+
         } catch (error) {
-            console.log("AUDIO CALL ERROR:", error);
+            console.log(
+                "AUDIO CALL ERROR:",
+                error
+            );
         }
     };
 
@@ -37,17 +48,32 @@ const ChatHeader = ({ channel, otherUser, currentUserId, onBack, }) => {
             <IconButton icon="arrow-left" size={24} onPress={onBack} />
 
             {/* Profile image */}
-            {otherUser?.image ? (
-                <Avatar.Image size={42}
-                    source={{ uri: otherUser.image }}
-                />
-            ) : (
-                <Avatar.Text
-                    size={42}
-                    label={getProfileInitial(otherUser?.name)}
-                    color={COLORS.white}
-                />
-            )}
+
+            {/* Profile image */}
+            <Pressable
+                onPress={() => setImagePreviewOpen(true)}
+            >
+                {otherUser?.image ? (
+                    <Avatar.Image
+                        size={42}
+                        source={{ uri: otherUser.image }}
+                    />
+                ) : (
+                    <Avatar.Text
+                        size={42}
+                        label={getProfileInitial(otherUser?.name)}
+                        color={COLORS.white}
+                    />
+                )}
+            </Pressable>
+
+            <ProfileImagePreview
+                visible={imagePreviewOpen}
+                image={otherUser?.image || null}
+                onClose={() => setImagePreviewOpen(false)}
+            />
+
+
 
             {/* Name + status */}
             <View style={{ flex: 1, marginLeft: 10, }}  >

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "587609219776",
+    "project_id": "linkup-a6aed",
+    "storage_bucket": "linkup-a6aed.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:587609219776:android:94cbc1cfd52ed7adc14325",
+        "android_client_info": {
+          "package_name": "com.devamna.LinkUpchatapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAReQpYIxNMTzqM1ta7i7dLIDsKbtywuvM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

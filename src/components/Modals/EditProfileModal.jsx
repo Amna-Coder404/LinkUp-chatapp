@@ -16,9 +16,11 @@ import {
     TextInput,
 } from "react-native-paper";
 
-import COLORS from "../../../constants/colors";
-import styles from "../../../styles/EditProfileModal.styles";
-import { getProfileInitial } from "../../../utils/getImageSource";
+
+
+import COLORS from "../../constants/colors";
+import styles from "../../styles/EditProfileModal.styles";
+import { getProfileInitial } from "../../utils/getImageSource";
 
 const EditProfileModal = ({ visible, onClose, profile, saving, onSave, onChangePhoto,
 }) => {

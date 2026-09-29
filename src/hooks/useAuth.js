@@ -1,8 +1,10 @@
+
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
 
 export const useAuth = () => {
     const [session, setSession] = useState(null);
+    const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -12,22 +14,29 @@ export const useAuth = () => {
             try {
                 const {
                     data: { session },
+                    error: sessionError,
                 } = await supabase.auth.getSession();
+
+                if (sessionError) {
+                    throw sessionError;
+                }
 
                 if (!session) {
                     if (mounted) {
                         setSession(null);
+                        setUser(null);
                         setLoading(false);
                     }
 
                     return;
                 }
 
-                // Verify that the user in the stored session
-                // still exists in Supabase Auth.
-                const { data: { user }, error, } = await supabase.auth.getUser();
+                const {
+                    data: { user },
+                    error: userError,
+                } = await supabase.auth.getUser();
 
-                if (error || !user) {
+                if (userError || !user) {
                     console.log("Stale session found. Clearing local session.");
 
                     await supabase.auth.signOut({
@@ -36,6 +45,7 @@ export const useAuth = () => {
 
                     if (mounted) {
                         setSession(null);
+                        setUser(null);
                         setLoading(false);
                     }
 
@@ -44,17 +54,26 @@ export const useAuth = () => {
 
                 if (mounted) {
                     setSession(session);
+                    setUser(user);
                     setLoading(false);
                 }
             } catch (error) {
                 console.log("AUTH INITIALIZATION ERROR:", error);
 
-                await supabase.auth.signOut({
-                    scope: "local",
-                });
+                try {
+                    await supabase.auth.signOut({
+                        scope: "local",
+                    });
+                } catch (signOutError) {
+                    console.log(
+                        "AUTH SIGNOUT ERROR:",
+                        signOutError
+                    );
+                }
 
                 if (mounted) {
                     setSession(null);
+                    setUser(null);
                     setLoading(false);
                 }
             }
@@ -62,12 +81,17 @@ export const useAuth = () => {
 
         initializeAuth();
 
-        const { data: { subscription }, } = supabase.auth.onAuthStateChange((_event, newSession) => {
-            if (mounted) {
+        const {
+            data: { subscription },
+        } = supabase.auth.onAuthStateChange(
+            (_event, newSession) => {
+                if (!mounted) return;
+
                 setSession(newSession);
+                setUser(newSession?.user ?? null);
                 setLoading(false);
             }
-        });
+        );
 
         return () => {
             mounted = false;
@@ -77,6 +101,8 @@ export const useAuth = () => {
 
     return {
         session,
+        user,
         loading,
     };
 };
+
