@@ -1,13 +1,25 @@
+
 import { StyleSheet } from "react-native";
 import COLORS from "../constants/colors";
 
 const styles = StyleSheet.create({
+    modalWrapper: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        margin: 0,
+        paddingHorizontal: 16,
+    },
+
     modal: {
-        margin: 16,
+        width: "100%",
+        maxWidth: 500,
         maxHeight: "90%",
-        padding: 20,
         backgroundColor: COLORS.surface,
         borderRadius: 24,
+        paddingHorizontal: 20,
+        paddingTop: 10,
+        paddingBottom: 20,
     },
 
     handle: {
@@ -36,6 +48,7 @@ const styles = StyleSheet.create({
         alignItems: "center",
         marginBottom: 24,
     },
+
     avatarWrapper: {
         position: "relative",
     },
@@ -60,21 +73,7 @@ const styles = StyleSheet.create({
         fontSize: 34,
         fontWeight: "900",
     },
-    modalWrapper: {
-        flex: 1,
-        justifyContent: "flex-end",
-        margin: 0,
-    },
 
-    modal: {
-        backgroundColor: COLORS.surface,
-        borderTopLeftRadius: 28,
-        borderTopRightRadius: 28,
-        paddingHorizontal: 20,
-        paddingTop: 10,
-        paddingBottom: 20,
-        maxHeight: "92%",
-    },
     changePhoto: {
         position: "absolute",
         right: -4,
@@ -88,7 +87,6 @@ const styles = StyleSheet.create({
         borderWidth: 3,
         borderColor: COLORS.surface,
     },
-
 
     input: {
         marginBottom: 14,
@@ -120,3 +118,4 @@ const styles = StyleSheet.create({
 });
 
 export default styles;
+

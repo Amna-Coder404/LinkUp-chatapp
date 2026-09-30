@@ -66,7 +66,7 @@ const EditProfileModal = ({ visible, onClose, profile, saving, onSave, onChangeP
     };
 
     return (
-        <Portal>
+        <Portal >
             <Modal
                 visible={visible}
                 onDismiss={onClose}

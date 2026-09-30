@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
 
@@ -14,11 +13,11 @@ export const useAuth = () => {
             try {
                 const {
                     data: { session },
-                    error: sessionError,
+                    error,
                 } = await supabase.auth.getSession();
 
-                if (sessionError) {
-                    throw sessionError;
+                if (error) {
+                    throw error;
                 }
 
                 if (!session) {
@@ -31,49 +30,34 @@ export const useAuth = () => {
                     return;
                 }
 
-                const {
-                    data: { user },
-                    error: userError,
-                } = await supabase.auth.getUser();
-
-                if (userError || !user) {
-                    console.log("Stale session found. Clearing local session.");
-
-                    await supabase.auth.signOut({
-                        scope: "local",
-                    });
-
-                    if (mounted) {
-                        setSession(null);
-                        setUser(null);
-                        setLoading(false);
-                    }
-
-                    return;
-                }
+                /*
+                 * getSession() gives us the persisted
+                 * local session.
+                 *
+                 * Do not call getUser() here because
+                 * it requires a network request.
+                 */
 
                 if (mounted) {
                     setSession(session);
-                    setUser(user);
+                    setUser(session.user);
                     setLoading(false);
                 }
-            } catch (error) {
-                console.log("AUTH INITIALIZATION ERROR:", error);
 
-                try {
-                    await supabase.auth.signOut({
-                        scope: "local",
-                    });
-                } catch (signOutError) {
-                    console.log(
-                        "AUTH SIGNOUT ERROR:",
-                        signOutError
-                    );
-                }
+            } catch (error) {
+                console.log(
+                    "AUTH INITIALIZATION ERROR:",
+                    error
+                );
+
+                /*
+                 * Do NOT signOut here.
+                 *
+                 * A network error should not delete
+                 * the locally persisted session.
+                 */
 
                 if (mounted) {
-                    setSession(null);
-                    setUser(null);
                     setLoading(false);
                 }
             }
@@ -105,4 +89,3 @@ export const useAuth = () => {
         loading,
     };
 };
-

@@ -35,10 +35,7 @@ const Profile = () => {
     const [editProfileOpen, setEditProfileOpen] = useState(false);
 
     // AUTH
-    const {
-        user,
-        loading: authLoading,
-    } = useAuth();
+    const { user, loading: authLoading, } = useAuth();
 
     // PROFILE
     const {
@@ -54,15 +51,19 @@ const Profile = () => {
         handleSignOut,
     } = useProfile(user);
 
-    const loading =
-        authLoading || profileLoading;
+    const loading = authLoading || profileLoading;
+
+
+
+    const openBlockedUsers = () => {
+        router.push("/(main)/blockUsers");
+    };
 
     if (loading) {
         return <Loader />;
     }
 
-    const currentImage =
-        profile?.avatar_url || null;
+    const currentImage = profile?.avatar_url || null;
 
     return (
         <ScrollView
@@ -84,8 +85,7 @@ const Profile = () => {
                     icon="pencil-outline"
                     size={21}
                     iconColor={COLORS.text}
-                    onPress={() =>
-                        setEditProfileOpen(true)
+                    onPress={() => setEditProfileOpen(true)
                     }
                     style={styles.headerButton}
                 />
@@ -95,7 +95,7 @@ const Profile = () => {
             <View style={styles.profile}>
                 <View style={styles.avatarWrapper}>
                     <TouchableOpacity
-                        onPress={() => setEditProfileOpen(true)}
+                        onPress={() => setPhotoModalOpen(true)}
                         activeOpacity={0.8}
                         disabled={avatarUploading}
                     >
@@ -155,8 +155,7 @@ const Profile = () => {
 
             <TouchableOpacity
                 style={styles.menuItem}
-                onPress={() => { }}
-            >
+                onPress={openBlockedUsers} >
                 <View style={styles.menuIcon}>
                     <Icon
                         source="account-cancel-outline"
@@ -170,11 +169,7 @@ const Profile = () => {
                         Blocked Users
                     </Text>
 
-                    <Text
-                        style={
-                            styles.menuSubtitle
-                        }
-                    >
+                    <Text style={styles.menuSubtitle}  >
                         Manage blocked accounts
                     </Text>
                 </View>
@@ -182,9 +177,7 @@ const Profile = () => {
                 <Icon
                     source="chevron-right"
                     size={22}
-                    color={
-                        COLORS.textMuted
-                    }
+                    color={COLORS.textMuted}
                 />
             </TouchableOpacity>
 
@@ -194,9 +187,7 @@ const Profile = () => {
                 icon="logout"
                 textColor={COLORS.danger}
                 style={styles.logoutButton}
-                contentStyle={
-                    styles.logoutContent
-                }
+                contentStyle={styles.logoutContent}
                 onPress={handleSignOut}
             >
                 Sign out

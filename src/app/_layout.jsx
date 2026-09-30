@@ -5,16 +5,18 @@ import { StatusBar } from 'react-native';
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Provider as PaperProvider } from 'react-native-paper';
 import Loader from "../components/Loader";
+import InternetBanner from "../components/NetInfo/InternetBanner";
 import SafeAreaWrapper from "../components/SafeAreaWrapper";
 import StreamVideoProvider from "../components/StreamVideoProvider";
 import { useAuth } from "../hooks/useAuth";
+
 SplashScreen.preventAutoHideAsync();
 
 const RootLayout = () => {
   const { session, loading } = useAuth();
   const segments = useSegments();
   const router = useRouter();
-  console.log("ROOT LAYOUT: FILE LOADED");
+
   useEffect(() => {
     if (loading) return;
 
@@ -49,6 +51,8 @@ const RootLayout = () => {
         <StreamVideoProvider>
           <SafeAreaWrapper>
             <StatusBar barStyle={"dark-content"} />
+
+            <InternetBanner />
             <Stack screenOptions={{ headerShown: false }} />
           </SafeAreaWrapper>
         </StreamVideoProvider>
