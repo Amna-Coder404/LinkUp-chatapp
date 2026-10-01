@@ -4,6 +4,8 @@ import { View } from "react-native";
 import { IconButton, Menu, Searchbar, Text } from "react-native-paper";
 import { ChannelList, Chat, OverlayProvider } from "stream-chat-expo";
 
+import { getBlockedUsers } from "../../../services/blockService";
+
 import Loader from "../../../components/Loader";
 import COLORS from "../../../constants/colors";
 import useProfile from "../../../hooks/useProfile";
@@ -43,12 +45,26 @@ const Home = () => {
 
             const profile = await getProfileByLinkUpId(id);
 
+            const blockedUsers = await getBlockedUsers();
+
+            const isBlocked = blockedUsers.some(
+                (user) => user.linkUpId === profile.linkUpId
+            );
+
+            if (profile.id === userId) {
+                setSearchError("You can't message yourself.");
+                return;
+            }
+            if (isBlocked) {
+                setSearchError("You blocked this user.");
+                return;
+            }
+
             const channel = await createConversation(
                 client,
                 userId,
                 profile.id
             );
-
             setLinkUpId("");
             setSearchError("");
             setSearchOpen(false);

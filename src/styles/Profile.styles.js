@@ -4,182 +4,193 @@ import COLORS from "../constants/colors";
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: "F4F2FF",
+        backgroundColor: COLORS.white,
     },
 
     content: {
-        paddingHorizontal: 20,
-        paddingTop: 38,
-        paddingBottom: 36,
+        paddingHorizontal: 22,
+        paddingTop: 18,
+        paddingBottom: 45,
     },
 
     // Header
     header: {
+        height: 48,
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-between",
-        marginBottom: 42,
+        marginBottom: 26,
     },
 
     headerButton: {
-        width: 44,
-        height: 44,
         margin: 0,
-
-        elevation: 1,
     },
 
     headerTitle: {
         color: COLORS.text,
-        fontSize: 21,
-        fontWeight: "900",
-        letterSpacing: -0.8,
+        fontSize: 19,
+        fontWeight: "800",
+        letterSpacing: -0.4,
     },
 
-    // Profile
-    profile: {
+    // Profile Header
+    profileHeader: {
+        flexDirection: "row",
         alignItems: "center",
-        marginBottom: 42,
+        marginBottom: 34,
+        paddingVertical: 8,
     },
 
     avatarWrapper: {
         position: "relative",
-        alignItems: "center",
-        justifyContent: "center",
     },
+
     avatar: {
-        width: 108,
-        height: 108,
-        borderRadius: 60,
-        borderWidth: 3,
-        borderColor: COLORS.primary,
+        width: 112,
+        height: 112,
+        borderRadius: 56,
     },
 
     avatarFallback: {
         backgroundColor: COLORS.primary,
-        borderRadius: 60,
+        borderRadius: 56,
     },
 
-    name: {
-        color: COLORS.text,
-        fontSize: 30,
-        fontWeight: "900",
-        letterSpacing: -1.3,
-        marginTop: 20,
-    },
-
-    email: {
-        color: COLORS.textSecondary,
-        fontSize: 14,
-        fontWeight: "500",
-        marginTop: 5,
-    },
     avatarLoader: {
         position: "absolute",
         top: 0,
         left: 0,
-        width: 108,
-        height: 108,
+        width: 112,
+        height: 112,
+        borderRadius: 56,
         alignItems: "center",
         justifyContent: "center",
-        borderRadius: 60,
-        backgroundColor: "rgba(255, 255, 255, 0.65)",
+        backgroundColor: "rgba(255, 255, 255, 0.7)",
     },
-    idPill: {
+
+    cameraButton: {
+        position: "absolute",
+        right: -2,
+        bottom: 2,
+        width: 30,
+        height: 30,
+        borderRadius: 15,
+        alignItems: "center",
+        justifyContent: "center",
+        backgroundColor: COLORS.primary,
+        borderWidth: 3,
+        borderColor: COLORS.white,
+    },
+
+    profileInfo: {
+        flex: 1,
+        marginLeft: 20,
+        paddingRight: 4,
+    },
+
+    name: {
+        color: COLORS.text,
+        fontSize: 25,
+        fontWeight: "800",
+        letterSpacing: -0.8,
+    },
+
+    email: {
+        color: COLORS.textSecondary,
+        fontSize: 12,
+        fontWeight: "500",
+        marginTop: 6,
+    },
+
+    linkupRow: {
         flexDirection: "row",
         alignItems: "center",
-        marginTop: 15,
-        paddingLeft: 15,
-        paddingRight: 3,
-        minHeight: 42,
-        borderRadius: 13,
-        backgroundColor: COLORS.surfaceElevated,
-        borderWidth: 1,
-        borderColor: COLORS.border,
+        alignSelf: "flex-start",
+        gap: 7,
+        marginTop: 11,
     },
 
     linkUpId: {
         color: COLORS.primary,
-        fontSize: 14,
-        fontWeight: "900",
-        letterSpacing: 0.8,
+        fontSize: 13,
+        fontWeight: "800",
+        letterSpacing: 0.5,
     },
 
-    copyButton: {
-        margin: 0,
-    },
-
-    // Section
+    // Sections
     sectionTitle: {
         color: COLORS.textMuted,
         fontSize: 11,
-        fontWeight: "900",
-        letterSpacing: 1.6,
+        fontWeight: "800",
+        letterSpacing: 1.5,
         textTransform: "uppercase",
-        marginBottom: 10,
-        marginTop: 4,
+        marginBottom: 2,
+        marginTop: 8,
     },
 
-    // Action row
+    // Action Rows
     menuItem: {
+        minHeight: 70,
         flexDirection: "row",
         alignItems: "center",
-        minHeight: 72,
-        paddingHorizontal: 14,
-        marginBottom: 26,
-        borderRadius: 20,
-        backgroundColor: COLORS.surface,
-        borderWidth: 1,
-        borderColor: COLORS.border,
-
-        shadowColor: COLORS.black,
-        shadowOffset: {
-            width: 0,
-            height: 4,
-        },
-        shadowOpacity: 0.05,
-        shadowRadius: 12,
-        elevation: 2,
+        paddingVertical: 10,
+        borderBottomWidth: 1,
+        borderBottomColor: COLORS.border,
     },
 
     menuIcon: {
-        width: 44,
-        height: 44,
+        width: 42,
+        height: 42,
         alignItems: "center",
         justifyContent: "center",
-        borderRadius: 14,
-        backgroundColor: COLORS.surfaceElevated,
     },
 
     menuText: {
         flex: 1,
-        marginLeft: 13,
+        marginLeft: 9,
     },
 
     menuTitle: {
         color: COLORS.text,
         fontSize: 15,
-        fontWeight: "800",
+        fontWeight: "700",
     },
 
     menuSubtitle: {
         color: COLORS.textMuted,
         fontSize: 12,
-        lineHeight: 17,
         marginTop: 3,
     },
 
     // Logout
     logoutButton: {
-        marginTop: 8,
-        borderRadius: 16,
-        borderWidth: 1.5,
-        borderColor: COLORS.danger,
-        backgroundColor: COLORS.surface,
+        marginTop: 28,
+        borderRadius: 0,
+        borderWidth: 0,
+        backgroundColor: "transparent",
     },
 
     logoutContent: {
-        height: 52,
+        height: 48,
+    },
+    titleRow: {
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between"
+    },
+
+    blockedCount: {
+        width: 24,
+        height: 24,
+        top: 12,
+        borderRadius: 12,
+        alignItems: "center",
+        justifyContent: "center",
+        textAlign: "center",
+        color: COLORS.primary,
+        fontSize: 11,
+        fontWeight: "800",
+        backgroundColor: "#F0ECFF",
     },
 });
 

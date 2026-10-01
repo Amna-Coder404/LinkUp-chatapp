@@ -17,10 +17,14 @@ import {
 } from "react-native-paper";
 
 
-
 import COLORS from "../../constants/colors";
 import styles from "../../styles/EditProfileModal.styles";
 import { getProfileInitial } from "../../utils/getImageSource";
+import {
+    canChangeLinkUpId,
+    getNextLinkUpIdChangeDate,
+} from "../../utils/linkUpIdCooldown";
+
 
 const EditProfileModal = ({ visible, onClose, profile, saving, onSave, onChangePhoto,
 }) => {
@@ -28,7 +32,22 @@ const EditProfileModal = ({ visible, onClose, profile, saving, onSave, onChangeP
     const [linkUpId, setLinkUpId] = useState("");
     const [error, setError] = useState("");
 
+    const [canChangeId, setCanChangeId] = useState(true);
+    const [nextChangeDate, setNextChangeDate] = useState(null);
+
     const slideAnim = useRef(new Animated.Value(500)).current;
+
+    useEffect(() => {
+        if (!visible || !profile) return;
+
+        const changedAt = profile.linkup_id_changed_at;
+
+        setCanChangeId(canChangeLinkUpId(changedAt));
+        setNextChangeDate(
+            getNextLinkUpIdChangeDate(changedAt)
+        );
+    }, [visible, profile]);
+
 
     useEffect(() => {
         if (visible && profile) {
@@ -169,15 +188,27 @@ const EditProfileModal = ({ visible, onClose, profile, saving, onSave, onChangeP
                             activeOutlineColor={COLORS.primary}
                             textColor={COLORS.text}
                             maxLength={6}
+
                             left={
                                 <TextInput.Affix text="LU" />
                             }
                         />
 
-                        <Text style={styles.helper}>
-                            Your LinkUp ID can be changed once every
-                            7 days.
-                        </Text>
+                        {!canChangeId && nextChangeDate ? (
+                            <Text style={styles.helper}>
+                                You can change your LinkUp ID again on{" "}
+                                {nextChangeDate.toLocaleDateString("en-GB", {
+                                    day: "numeric",
+                                    month: "short",
+                                    year: "numeric",
+                                })}
+                                .
+                            </Text>
+                        ) : (
+                            <Text style={styles.helper}>
+                                Your LinkUp ID can be changed once every 7 days.
+                            </Text>
+                        )}
 
                         {error ? (
                             <Text style={styles.error}>

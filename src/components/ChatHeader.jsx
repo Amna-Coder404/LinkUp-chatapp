@@ -1,7 +1,6 @@
-
+import { router } from "expo-router";
 import { useState } from "react";
-import { Pressable, View } from "react-native";
-
+import { TouchableOpacity, View } from "react-native";
 import {
     Avatar,
     IconButton,
@@ -15,22 +14,32 @@ import styles from "../styles/Chatui.styles";
 import { getProfileInitial } from "../utils/getImageSource";
 
 import useChatMenu from "../hooks/useChatMenu";
-import ProfileImagePreview from "./Modals/ProfileImagePreview";
+import useNetworkStatus from "../hooks/useNetWork";
+import NoInternetModal from "./NetInfo/NoInternetModal";
 
 
 const ChatHeader = ({ channel, otherUser, currentUserId, onBack, }) => {
-    // call action
+    // call actions
     const { calling, startAudioCall, startVideoCall, } = useStreamCall();
 
 
     // chat menu actions
     const { clearChat, blockUser, deleteChat } = useChatMenu(otherUser, onBack);
 
-    const [imagePreviewOpen, setImagePreviewOpen] = useState(false);
+
+    const [offline, setOffline] = useState(false);
+
+    const { isOnline } = useNetworkStatus();
+
     const [menuOpen, setMenuOpen] = useState(false);
 
-
+    // Audio Call
     const handleAudioCall = async () => {
+        if (!isOnline) {
+            setOffline(true);
+            return;
+        }
+
         try {
             await startAudioCall(currentUserId, otherUser?.id);
         } catch (error) {
@@ -39,7 +48,12 @@ const ChatHeader = ({ channel, otherUser, currentUserId, onBack, }) => {
     };
 
 
+    // Video Call
     const handleVideoCall = async () => {
+        if (!isOnline) {
+            setOffline(true);
+            return;
+        }
         try {
             await startVideoCall(
                 currentUserId,
@@ -50,6 +64,17 @@ const ChatHeader = ({ channel, otherUser, currentUserId, onBack, }) => {
         }
     };
 
+    // Router To  Other User Profile
+    const handleRouter = () => {
+        if (!otherUser?.id) return;
+
+        router.push({
+            pathname: "/chat/user-profile/[id]",
+            params: {
+                id: otherUser.id,
+            },
+        });
+    }
 
     return (
         <View style={styles.ChatHeader}>
@@ -63,9 +88,7 @@ const ChatHeader = ({ channel, otherUser, currentUserId, onBack, }) => {
 
 
             {/* Profile image */}
-            <Pressable
-                onPress={() => setImagePreviewOpen(true)}
-            >
+            <TouchableOpacity activeOpacity={0.7} onPress={handleRouter} style={styles.routerBtn} >
                 {otherUser?.image ? (
                     <Avatar.Image
                         size={42}
@@ -78,54 +101,44 @@ const ChatHeader = ({ channel, otherUser, currentUserId, onBack, }) => {
                         color={COLORS.white}
                     />
                 )}
-            </Pressable>
 
 
-            {/* Profile image preview */}
-            <ProfileImagePreview
-                visible={imagePreviewOpen}
-                image={otherUser?.image || null}
-                onClose={() => setImagePreviewOpen(false)}
-            />
 
-
-            {/* Name + status */}
-            <View
-                style={{
-                    flex: 1,
-                    marginLeft: 10,
-                }}
-            >
-                <Text
-                    variant="titleMedium"
-                    numberOfLines={1}
+                {/* Name + status */}
+                <View
                     style={{
-                        fontWeight: "600",
+                        flex: 1,
+                        marginLeft: 10,
                     }}
                 >
-                    {otherUser?.name || otherUser?.linkUpId ||
-                        "Unknown User"}
-                </Text>
-
-
-                <View style={styles.statusCon}>
-                    <View
-                        style={[
-                            { backgroundColor: otherUser?.online ? "#22C55E" : "#9CA3AF", },
-                            styles.status,
-                        ]}
-                    />
-
-                    <Text variant="bodySmall" style={styles.statusText}  >
-                        {otherUser?.online ? "Online" : "Offline"}
+                    <Text
+                        variant="titleMedium"
+                        numberOfLines={1}
+                        style={{
+                            fontWeight: "600",
+                        }}
+                    >
+                        {otherUser?.name || otherUser?.linkUpId ||
+                            "Unknown User"}
                     </Text>
-                    {/* TODO LATER ADD a profile seaction for this */}
-                    {/* <Text variant="bodySmall" style={styles.statusText}  >
-                        {otherUser.linkupId}
-                    </Text> */}
-                </View>
-            </View>
 
+
+                    <View style={styles.statusCon}>
+                        <View
+                            style={[
+                                { backgroundColor: otherUser?.online ? "#22C55E" : "#9CA3AF", },
+                                styles.status,
+                            ]}
+                        />
+
+                        <Text variant="bodySmall" style={styles.statusText}  >
+                            {otherUser?.online ? "Online" : "Offline"}
+                        </Text>
+
+                    </View>
+                </View>
+
+            </TouchableOpacity>
 
             {/* Audio call */}
             <IconButton
@@ -198,6 +211,8 @@ const ChatHeader = ({ channel, otherUser, currentUserId, onBack, }) => {
 
             </Menu>
 
+            {/* MODEL */}
+            <NoInternetModal visible={offline} onClose={() => setOffline(false)} />
         </View>
     );
 };

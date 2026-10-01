@@ -1,4 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Alert } from "react-native";
 
 const BLOCKED_USERS_KEY = "linkup_blocked_users";
 
@@ -83,4 +84,87 @@ export const isUserBlocked = async (userId) => {
 
         return false;
     }
+
+
+
+
 };
+
+// BLcok USer from Profile
+export const blockUserFromProfile = async (client, user
+) => {
+
+    return new Promise((resolve) => {
+
+        Alert.alert(
+            "Block user?",
+            `Are you sure you want to block ${user?.full_name || "this user"
+            }?`,
+            [
+                {
+                    text: "Cancel",
+                    style: "cancel",
+                    onPress: () => resolve(false),
+                },
+
+                {
+                    text: "Block",
+                    style: "destructive",
+
+                    onPress: async () => {
+                        try {
+
+                            if (!client) {
+                                throw new Error(
+                                    "Stream Chat client is not available."
+                                );
+                            }
+
+                            if (!user?.id) {
+                                throw new Error("User ID is not available.");
+                            }
+
+
+                            // Block on Stream
+                            await client.blockUser(user.id);
+
+                            // Save locally
+                            await saveBlockedUser({
+                                id: user.id,
+                                name: user.full_name,
+                                image: user.avatar_url || null,
+                                linkupId: user.linkup_id,
+                            });
+
+
+                            Alert.alert(
+                                "User blocked",
+                                "This user has been blocked successfully.",
+                                [
+                                    {
+                                        text: "OK",
+                                        onPress: () =>
+                                            resolve(true),
+                                    },
+                                ]
+                            );
+
+                        } catch (error) {
+
+                            console.log("BLOCK USER ERROR:",
+                                error
+                            );
+
+                            Alert.alert(
+                                "Block failed",
+                                "Unable to block this user. Please try again."
+                            );
+
+                            resolve(false);
+                        }
+                    },
+                },
+            ]
+        );
+    });
+}

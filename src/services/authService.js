@@ -1,6 +1,6 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { streamClient } from "../lib/stream";
 import { supabase } from "../lib/supabase";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 
 export const signUpUser = async ({ email, password, fullName }) => {
@@ -50,7 +50,7 @@ export const signUpUser = async ({ email, password, fullName }) => {
 
 
 // Sign Out
-// Sign Out
+
 export const signOut = async () => {
     try {
         // 1. Disconnect Stream Chat first
@@ -79,10 +79,7 @@ export const signOut = async () => {
 
 // Sign In
 export const signin = async ({ email, password }) => {
-    const {
-        data,
-        error,
-    } = await supabase.auth.signInWithPassword({
+    const { data, error, } = await supabase.auth.signInWithPassword({
         email,
         password,
     });
@@ -128,4 +125,25 @@ export const signin = async ({ email, password }) => {
     );
 
     return data;
+};
+
+
+// Change password
+export const changePassword = async ({ email, currentPassword, newPassword, }) => {
+    // Verify current password 
+    const { error: signInError } = await supabase.auth
+    signInWithPassword({ email, password: currentPassword, });
+
+    if (signInError) {
+        throw new Error("Current password is incorrect.");
+    }
+    // Update password 
+    const { error: updateError } = await supabase.auth.updateUser({ password: newPassword, });
+
+    if (updateError) {
+        console.log("UPDATE PASSWORD ERROR:", updateError
+
+        );
+        throw new Error(updateError.message || "Unable to change password.");
+    } return true;
 };

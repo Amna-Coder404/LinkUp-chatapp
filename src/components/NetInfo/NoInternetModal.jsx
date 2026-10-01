@@ -9,10 +9,7 @@ import {
 import COLORS from "../../constants/colors";
 import styles from "@/styles/NetInfo.style";
 
-const NoInternetModal = ({
-    visible,
-    onClose,
-}) => {
+const NoInternetModal = ({ visible, onClose, }) => {
     return (
         <Modal
             visible={visible}

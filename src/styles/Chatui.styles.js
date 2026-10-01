@@ -17,8 +17,12 @@ const styles = StyleSheet.create({
         right: 0,
         bottom: 0,
     },
-
-
+    // Router Btn 
+    routerBtn: {
+        flex: 1,
+        flexDirection: "row",
+        alignItems: "center",
+    },
     // ChatHeader
 
     ChatHeader: {
