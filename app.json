@@ -2,7 +2,7 @@
   "expo": {
     "name": "LinkUp",
     "slug": "LinkUp-chatapp",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "linkupchatapp",
@@ -47,7 +47,7 @@
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#208AEF",
+          "backgroundColor": "#FFFFFF",
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 140,
           "resizeMode": "contain"
